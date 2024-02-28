@@ -18,19 +18,19 @@ Class Action {
 	function login(){
 		
 			extract($_POST);		
-			$qry = $this->db->query("SELECT * FROM users where username = '".$username."' and password = '".md5($password)."' ");
+			$qry = $this->db->query("SELECT * FROM users where username = '".$username."' and password = '".md5($password)."'");
 			if($qry->num_rows > 0){
 				foreach ($qry->fetch_array() as $key => $value) {
 					if($key != 'passwors' && !is_numeric($key))
 						$_SESSION['login_'.$key] = $value;
 				}
-				if($_SESSION['login_type'] != 1){
-					foreach ($_SESSION as $key => $value) {
-						unset($_SESSION[$key]);
-					}
-					return 2 ;
-					exit;
-				}
+				// if($_SESSION['login_type'] != 1){
+				// 	foreach ($_SESSION as $key => $value) {
+				// 		unset($_SESSION[$key]);
+				// 	}
+				// 	return 2;
+				// 	exit;
+				// }
 					return 1;
 			}else{
 				return 3;
@@ -433,6 +433,16 @@ Class Action {
 		}
 	}
 
+	function getAllJunior($userID){
+		$qry = $this->db->query("SELECT a.id as alu_id,c.id as course_id,firstname,middlename,lastname,course,email,phone,connected_to,avatar,gender,batch,u.type,skills FROM alumnus_bio a join users u on a.id=u.alumnus_id join courses c on a.course_id=c.id where a.id not in ('$userID') and u.type='1'");
+		if($qry->num_rows > 0){
+			while ($row = mysqli_fetch_assoc($qry)) {
+				$resultarray[] = $row;
+			}
+			return $resultarray;
+		}
+	}
+
 	function getAllSenior($userID){
 		$qry = $this->db->query("SELECT a.id as alu_id,c.id as course_id,firstname,middlename,lastname,course,email,phone,connected_to,avatar,gender,batch,u.type,skills FROM alumnus_bio a join users u on a.id=u.alumnus_id join courses c on a.course_id=c.id where a.id not in ('$userID') and u.type='2'");
 		if($qry->num_rows > 0){
@@ -462,7 +472,7 @@ Class Action {
 	}
 
 	function getAllJobsCategory(){
-		$qry = $this->db->query("SELECT DISTINCT(job_category) FROM careers");
+		$qry = $this->db->query("SELECT * FROM careers");
 		if($qry->num_rows > 0){
 			while ($row = mysqli_fetch_assoc($qry)) {
 				$resultarray[] = $row;
@@ -504,7 +514,7 @@ Class Action {
 			
 		if($qry1->num_rows > 0){
 			
-			$qry = $this->db->query("SELECT * FROM users where username = '".$username."' and password = '".md5($password)."' ");
+			$qry = $this->db->query("SELECT u.*,a.batch,a.gender FROM users u join alumnus_bio a on u.alumnus_id=a.id where u.username = '".$username."' and u.password = '".md5($password)."' ");
 			if($qry->num_rows > 0){
 				$data['response']['user'] = mysqli_fetch_assoc($qry);
 				$data['response']['status'] = 200;

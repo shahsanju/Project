@@ -11,6 +11,12 @@ if($action == 'get_all_alumni'){
 		echo json_encode($data);
 }
 
+if($action == 'get_all_junior'){
+	$userID = $_GET['current_user'];
+	$data = $crud->getAllJunior($userID);
+		echo json_encode($data);
+}
+
 if($action == 'get_all_senior'){
 	$userID = $_GET['current_user'];
 	$data = $crud->getAllSenior($userID);

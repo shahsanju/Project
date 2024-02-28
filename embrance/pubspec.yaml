@@ -41,6 +41,9 @@ dependencies:
   html_unescape:
   cached_network_image:
   url_launcher:
+  flutter_widget_from_html:
+  flutter_webview_plugin:
+  intl:
 
 
   # The following adds the Cupertino Icons font to your application.

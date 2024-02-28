@@ -6,6 +6,7 @@ class HomeController extends GetxController{
 
   var userName = "".obs;
   final user = GetStorage();
+  final SocketConnection socketConnection = Get.find<SocketConnection>();
 
   @override
   void onInit() {
@@ -13,4 +14,5 @@ class HomeController extends GetxController{
 
     super.onInit();
   }
+
 }

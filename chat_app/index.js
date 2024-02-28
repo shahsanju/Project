@@ -18,7 +18,6 @@ io.on('connection', (socket) => {
      socket.on('join', (data) => {
         //socket.leave(chatID)
         socket.join(data);
-        
         console.log("JOIN CHANNEL"+data);
     
     })
@@ -56,7 +55,6 @@ io.on('connection', (socket) => {
             // content = data.message.content
             console.log(data);
     
-            
             
     
             //Send message to only that particular room

@@ -1,11 +1,11 @@
 import 'dart:math';
 
 import 'package:date_picker_timeline/date_picker_widget.dart';
-import 'package:embrance/home/alumni_connect/model/alumni_response_entity.dart';
-import 'package:embrance/network/constants.dart';
+import 'package:embrance/component/util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import 'alumni_controller.dart';
 
@@ -18,7 +18,7 @@ class AlumniConnectMeetingView extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
 
 
-    return GetBuilder<AlumniController>(
+    return  GetBuilder<AlumniController>(
         init: Get.put<AlumniController>(AlumniController()),
         builder: (controller) {
           controller.loadData();
@@ -61,9 +61,18 @@ class AlumniConnectMeetingView extends StatelessWidget {
                             initialSelectedDate: DateTime.now(),
                             selectionColor: Colors.green,
                             selectedTextColor: Colors.white,
+                            //inactiveDates: [DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1)),DateTime.now().subtract(Duration(days: DateTime.now().weekday - 2)),DateTime.now().subtract(Duration(days: DateTime.now().weekday - 4)),DateTime.now().subtract(Duration(days: DateTime.now().weekday - 6))],
                             onDateChange: (date) {
                               // New date selected
-                              print(date);
+
+                              if(DateFormat('EEEE').format(date)=="Thursday" || DateFormat('EEEE').format(date)=="Friday") {
+                                controller.selectedDate.value = "${date.day}-${date.month}-${date.year}";
+                              }else{
+                                controller.selectedDate.value="";
+                                Util.showMessage(context, "You can schedule the meeting only for Two days either Thursday or Friday.");
+                              }
+                              print("${date.day}-${date.month}-${date.year}");
+                              print("${date.weekday}");
                             },
                           ),
                         ),
@@ -106,7 +115,6 @@ class AlumniConnectMeetingView extends StatelessWidget {
                                 groupValue: controller.groupValue.value,
                                 onChanged: (value) {
                                   controller.groupValue.value = value!;
-                                  // print(value.toString());
                                 },
                                 title: Text("In Person", style: TextStyle(
                                     color: Colors.black, fontSize: 15),),
@@ -129,9 +137,10 @@ class AlumniConnectMeetingView extends StatelessWidget {
                               color: Colors.black, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.all(8.0),
                         child: TextField(
+                          controller: controller.msgController,
                           decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                 borderSide:
@@ -143,14 +152,23 @@ class AlumniConnectMeetingView extends StatelessWidget {
                               )),
                           keyboardType: TextInputType.multiline,
                           minLines: 1, //Normal textInputField will be displayed
-                          maxLines:
-                              5, // when user presses enter it will adapt to it
+                          maxLines: 5, // when user presses enter it will adapt to it
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 10.0,top:20,right: 10.0),
                         child: MaterialButton(onPressed: (){
 
+
+                          if(controller.selectedDate.value.isEmpty){
+                            Util.showMessage(context, "You can schedule the meeting only for Two days either Thursday or Friday.");
+                          } else if(controller.selectedTime.value!="16:00" && controller.selectedTime.value!="16:30" && controller.selectedTime.value!="17:00"&& controller.selectedTime.value!="17:30" && controller.selectedTime.value!="18:00" && controller.selectedTime.value!="18:30"){
+                            Util.showMessage(context, "Please select meeting time either 16:00,16:30 or 17:00,17:30 or 18:00,18:30");
+                          }else if(controller.msgController.text.isEmpty){
+                            Util.showMessage(context, "Please enter meeting notes");
+                          }else{
+                            controller.saveMeeting(controller.data.aluId);
+                          }
                         },child: const Text("Save",style: TextStyle(fontSize: 18),),elevation: 10,color: Colors.green,textColor: Colors.white,height: 50,minWidth: width,),
                       ),
                     ],
@@ -191,7 +209,6 @@ class AlumniConnectMeetingView extends StatelessWidget {
   bottomPicker(AlumniController controller,BuildContext context,double height){
     showModalBottomSheet(context: context, builder: (BuildContext context){
         return SizedBox(
-          height: height/3,
           child: Column(
             children: [
               Align(
@@ -208,11 +225,14 @@ class AlumniConnectMeetingView extends StatelessWidget {
                       minutes: DateTime.now().minute,),
                   onTimerDurationChanged: (value) {
                     controller.selectedTime.value = "${value.toString().substring(0,5)}";
-                    print(value.toString());
+                    print(value.toString().substring(0,5));
                   }),
             ],
           ),
         );
     });
   }
+
+
+
 }
